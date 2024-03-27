@@ -41,7 +41,7 @@ public class AmazonDemoSteps {
 
 		login = new AmazonLoginPage(driver);
 
-		login.login("chaitrakt93@gmail.com", "Shop1993@");
+		login.login("chaitrakt93@gmail.com", "********");
 
 	}
 
