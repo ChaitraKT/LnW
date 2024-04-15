@@ -10,9 +10,10 @@ public class AmazonPaymentsPage {
 	WebDriver driver;
 	By cartLink = By.id("nav-cart");
 	By priceOnProductPage = By.xpath("(//span[@class='a-price-whole'])[1]");
+	By priceOnProductPage2 = By.xpath("//div[@id='newAccordionRow_0']//div[contains(@class,'a-section')]/span[@class='a-color-price']");
 	By priceOnCartPage = By.xpath("//div[@data-name='Active Items']//div[@class='sc-badge-price-to-pay']");
 	By subTotalPrice = By.xpath("//span[@id='sc-subtotal-amount-buybox']");
-	By removeItem = By.xpath("//div[@data-name='Active Items']//span[@data-action='delete']");
+	By removeItem = By.xpath("//div[@data-name='Active Items']//span[@data-action='delete']/span/input");
 	By totalItems = By.xpath("//span[@id='sc-subtotal-label-buybox']");
 
 	public AmazonPaymentsPage(WebDriver driver) {
@@ -35,10 +36,18 @@ public class AmazonPaymentsPage {
 
 		return driver.findElement(priceOnProductPage);
 	}
+	
+	public WebElement getPriceOnProductPage2() {
 
-	public WebElement getRemoveItem() {
+		return driver.findElement(priceOnProductPage2);
+	}
 
-		return driver.findElement(removeItem);
+	public void getRemoveItem() {
+		
+		 if(driver.findElement(removeItem).isDisplayed()) {
+			 System.out.print("delete option is present");
+			 driver.findElement(removeItem).click();
+		 }
 	}
 
 	public WebElement getPriceOnCartPage() {

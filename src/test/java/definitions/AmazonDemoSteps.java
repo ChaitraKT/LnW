@@ -28,7 +28,7 @@ public class AmazonDemoSteps {
 	AmazonPaymentsPage paymentsPage;
 	String priceOnProductPage;
 	String priceOnCartPage;
-	int total=0;
+	int price1=0, price2=0,total =0,length =0;
 	List<String> arrayList = new ArrayList<>();
 
 	@Given("I login to Amazon page")
@@ -41,7 +41,7 @@ public class AmazonDemoSteps {
 
 		login = new AmazonLoginPage(driver);
 
-		login.login("chaitrakt93@gmail.com", "********");
+		login.login("chaitrakt93@gmail.com", "Shop1993@");
 
 	}
 
@@ -60,7 +60,14 @@ public class AmazonDemoSteps {
 		Thread.sleep(3000);
 		paymentsPage = new AmazonPaymentsPage(driver);
 		priceOnProductPage = paymentsPage.getPriceOnProductPage().getText();
+		if(priceOnProductPage.equals(""))
+		priceOnProductPage = paymentsPage.getPriceOnProductPage2().getText().trim();
 		System.out.print("Price on product page is" + priceOnProductPage);
+		length = priceOnProductPage.length()-3;
+		if (priceOnProductPage.contains(".")) {
+			System.out.print("before removing dot "+length);
+			priceOnProductPage = priceOnProductPage.substring(0, length);
+		}
 		arrayList.add(priceOnProductPage);
 	}
 
@@ -80,34 +87,42 @@ public class AmazonDemoSteps {
 	@Then("Verify that the price is identical to the product page")
 	public void verify_that_the_price_is_identical_to_the_product_page() {
 		String exactPrice = null;
-		if (paymentsPage.cartHasMultipleItems())
-			for (int i = arrayList.size() - 1; i >= 0; i++) {
-				System.out.println("List is"+arrayList.get(i));
-				priceOnProductPage = arrayList.get(i);
-				List<WebElement> elements = paymentsPage.getPriceOnCartPageForMultiple();
-				for (WebElement element : elements) {
-					priceOnCartPage = element.getText();
+		int j=0;
+		if (paymentsPage.cartHasMultipleItems()) {
+			List<WebElement> elements = paymentsPage.getPriceOnCartPageForMultiple();
+			for (int i = arrayList.size() - 1; i >= 0; i--) {
+				price1 = Integer.parseInt(arrayList.get(i));	
+					priceOnCartPage = elements.get(j++).getText().trim();
 					if (priceOnCartPage.contains(".")) {
-						exactPrice = priceOnCartPage.substring(0, priceOnProductPage.length());
-						System.out.print("Cart page price is"+exactPrice);
+						exactPrice = priceOnCartPage.substring(0, priceOnCartPage.length()-3);
 					}
-					String formattedNumber = priceOnProductPage.replaceAll("[^\\d]", "");
-					//Printing value of i  
-					int j = Integer.parseInt(formattedNumber);  
-					total = total + j;
-					System.out.print("Total is" + total);
-					System.out.print("formatted number is "+formattedNumber);
-					Assert.assertEquals(priceOnProductPage, exactPrice);
+					price2 = Integer.parseInt(exactPrice);  
+					total = total + price2;
+					Assert.assertEquals(price1, price2);
 				}
 			}
 		else {
 			System.out.print("Inside else");
 			priceOnCartPage = paymentsPage.getPriceOnCartPage().getText().trim();
+			System.out.print("priceOn Cart page is"+priceOnCartPage);
 			if (priceOnCartPage.contains(".")) {
+				System.out.print("before removing dot "+priceOnProductPage.length());
 				exactPrice = priceOnCartPage.substring(0, priceOnProductPage.length());
+				System.out.print("after removing dot "+exactPrice);
+			    if (exactPrice.contains(",")) 
+			    	System.out.print("splitting logic is"+ exactPrice.split(",")[1]);
+				exactPrice = exactPrice.split(",")[0]+exactPrice.split(",")[1];		
 			}
-			total= Integer.parseInt(priceOnProductPage);
-			Assert.assertEquals(priceOnProductPage, exactPrice);
+			System.out.print("price On Cart page after splitting is"+exactPrice);
+			if (priceOnProductPage.contains(",")) 
+				priceOnProductPage = priceOnProductPage.split(",")[0]+priceOnProductPage.split(",")[1];	
+			System.out.print("priceOn Product page is"+priceOnProductPage);
+			price1= Integer.parseInt(priceOnProductPage);
+			System.out.print("price1 is after converting "+price1);
+			price2= Integer.parseInt(exactPrice);
+			System.out.print("price2 is after converting "+price2);
+			Assert.assertEquals(price1, price2);
+			total = price1;
 		}
 
 	}
@@ -115,10 +130,22 @@ public class AmazonDemoSteps {
 	@Then("Verify that the sub total is identical to the product page")
 	public void verify_that_the_sub_total_is_identical_to_the_product_page() {
 		String subTotalPrice = paymentsPage.getSubTotal().getText().trim();
-		Assert.assertEquals(String.valueOf(total), subTotalPrice.substring(0, priceOnProductPage.length()));
+		int index=0;
+		if (subTotalPrice.contains(".")) {
+			index = subTotalPrice.indexOf(".");
+			System.out.print("index is "+index);
+			subTotalPrice = subTotalPrice.substring(0,index);	
+			System.out.print("sub total after removing . is "+subTotalPrice);
+		    if (subTotalPrice.contains(",")) 
+		    	subTotalPrice = subTotalPrice.split(",")[0]+subTotalPrice.split(",")[1];		
+		}
+		paymentsPage.getRemoveItem();
+		Assert.assertEquals(total, Integer.parseInt(subTotalPrice));
+//		Thread.sleep(3000);
+		
 		}
 		
-//		paymentsPage.getRemoveItem().click();
+
 	
 
 }

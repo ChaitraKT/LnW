@@ -1,5 +1,6 @@
 Feature: Amazon add to card testcases
 
+@Smoke
 Scenario: Add items to cart and verify the price
 Given I login to Amazon page
 When I search for "<Item>" and press enter

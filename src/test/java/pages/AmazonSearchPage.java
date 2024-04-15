@@ -16,6 +16,7 @@ public class AmazonSearchPage {
 	By searchInput = By.id("twotabsearchtextbox");
 	By searchIcon = By.id("nav-search-submit-button");
 	By addToCartButton = By.xpath("//input[@id ='add-to-cart-button']");
+	By addToCart2Button = By.xpath("//div[@data-csa-c-is-in-initial-active-row='true']//input[@id ='add-to-cart-button']");
 	By sideModalOnAddToCart = By.xpath("//div[@id='attach-added-to-cart-message']");
 	By closeModal = By.xpath("//a[@id='attach-close_sideSheet-link']");
 
@@ -68,7 +69,10 @@ public class AmazonSearchPage {
 	}
 
 	public void addToCart() {
-		driver.findElement(addToCartButton).click();
+		if(driver.findElement(addToCartButton).isDisplayed())
+			driver.findElement(addToCartButton).click();
+		else
+            driver.findElement(addToCart2Button).click();
 	}
 }
 
